@@ -1,6 +1,6 @@
-import { useState } from "react";
-import styled from "styled-components";
-import Comment from "../../components/2.state/comment";
+import { useState } from 'react';
+import styled from 'styled-components';
+import Comment from '../../components/2.state/comment';
 
 function State2() {
   /*  
@@ -17,51 +17,118 @@ function State2() {
     */
 
   const [post, setPost] = useState({
-    title: "안녕하세요 여러분 김성용 강사입니다 :)",
-    content: "오늘도 모두 화이팅입니다!",
+    title: '안녕하세요 여러분 김성용 강사입니다 :)',
+    content: '오늘도 모두 화이팅입니다!',
     User: {
-      nickname: "김성용",
+      nickname: '김성용',
       age: 20,
       height: 190,
     },
     Comments: [
       {
         User: {
-          nickname: "김사과",
+          nickname: '김사과',
         },
-        content: "오늘도 화이팅입니다!",
+        content: '오늘도 화이팅입니다!',
         myComment: false,
       },
       {
         User: {
-          nickname: "반하나",
+          nickname: '반하나',
         },
-        content: "오늘도 화이팅입니다!",
+        content: '오늘도 화이팅입니다!',
         myComment: false,
       },
       {
         User: {
-          nickname: "오렌지",
+          nickname: '오렌지',
         },
-        content: "오늘도 화이팅입니다!",
+        content: '오늘도 화이팅입니다!',
         myComment: false,
       },
       {
         User: {
-          nickname: "이멜론",
+          nickname: '이멜론',
         },
-        content: "오늘도 화이팅입니다!",
+        content: '오늘도 화이팅입니다!',
         myComment: false,
       },
       {
         User: {
-          nickname: "박수박",
+          nickname: '박수박',
         },
-        content: "오늘도 화이팅입니다!",
+        content: '오늘도 화이팅입니다!',
         myComment: false,
       },
     ],
   });
+
+  const [user, setUser] = useState();
+  const [comment, setComment] = useState();
+
+  const onChangeUserInputValue = (e) => {
+    setUser(e.target.value);
+  };
+
+  const onChangeCommentInputValue = (e) => {
+    setComment(e.target.value);
+  };
+
+  const onAddCommentBtn = () => {
+    const newCommentAddPost = { ...post };
+    console.log(newCommentAddPost);
+    let newObj = new Object();
+    let userNewObj = new Object();
+    userNewObj.nickname = user;
+    newObj.User = userNewObj;
+    newObj.content = comment;
+    newObj.myComment = true;
+    newCommentAddPost.Comments.push(newObj);
+    setPost(newCommentAddPost);
+  };
+
+  /////////////////////////////////////////////////
+  const [state, setState] = useState(false); // [수정] 버튼 삼항연산자 (true / false)
+  const [commentBoxState, setCommentBoxState] = useState(false);
+  const [editComment, setEditComment] = useState(comment); // dom 건드리지 않고 입력된 댓글 내용 값 가져오기 위함
+  const [nickname, setNickname] = useState();
+
+  const editCommentBtn = () => {
+    setState((prev) => !prev);
+    setCommentBoxState(true);
+    console.log(post.Comments);
+    // const whoseComment = post.Comments.find((item) => item.User.current.nickname == nickname);
+    // console.log('훔', whoseComment);
+    const arr = [];
+    for (let i = 0; i < post.Comments.length; i++) {
+      arr.push(post.Comments[i].User.nickname);
+    }
+    console.log(arr); // ['김사과', '반하나', '오렌지', '이멜론', '박수박']
+
+    // const selectedOne = post.Comments.find((item) => item.User == '김사과');
+
+    // if (commentBoxState == true) {
+    //   if (editComment == comment) {
+    //     setCommentBoxState(false);
+    //   } else {
+    //     setComment(editComment);
+    //   }
+    // }
+  };
+
+  const CloseEditCommentBtn = () => {
+    setState((prev) => !prev);
+
+    if (comment == editComment) {
+      console.log(comment);
+      console.log(editComment);
+      setCommentBoxState(false);
+    } else if (comment != editComment) {
+      setComment(editComment);
+      setCommentBoxState(false);
+      console.log(comment);
+    }
+  };
 
   return (
     <S.Wrapper>
@@ -85,14 +152,24 @@ function State2() {
         <p>
           댓글 수: <span>{post.Comments.length}</span>
         </p>
-        <input placeholder="작성자" />
-        <input placeholder="댓글 내용" />
-        <button>댓글 작성</button>
+        <input placeholder="작성자" onChange={onChangeUserInputValue} />
+        <input placeholder="댓글 내용" onChange={onChangeCommentInputValue} />
+        <button onClick={onAddCommentBtn}>댓글 작성</button>
       </div>
       <S.CommentList>
         {/* list */}
         {/* 예시 데이터 */}
-        <Comment />
+        <Comment
+          post={post}
+          editComment={editComment}
+          setEditComment={setEditComment}
+          editCommentBtn={editCommentBtn}
+          CloseEditCommentBtn={CloseEditCommentBtn}
+          commentBoxState={commentBoxState}
+          state={state}
+          nickname={nickname}
+          setNickname={setNickname}
+        />
       </S.CommentList>
     </S.Wrapper>
   );
