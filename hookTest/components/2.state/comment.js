@@ -1,24 +1,46 @@
+import { useState } from 'react';
 import styled from 'styled-components';
 
-function Comment(props) {
-  const {
-    state,
-    post,
-    editComment,
-    setEditComment,
-    editCommentBtn,
-    CloseEditCommentBtn,
-    commentBoxState,
-    nickname,
-    setNickname,
-  } = props;
+function Comment({ post }) {
+  const { User, content, myComment } = post.Comments;
+  const [state, setState] = useState(false); // [수정] 버튼 삼항연산자 (true / false)
 
-  const { myComment } = post.Comments;
-  console.log(myComment);
+  const useInput = (initialization) => {
+    const [value, setValue] = useState();
+    const onChange = (event) => {
+      setValue(event.target.value);
+    };
+    return [value, onChange, setValue];
+  };
 
-  const onSaveChangeEditComment = (e) => {
-    setEditComment(e.target.value);
-    // console.log(e.target); // <textarea> </textarea>
+  const [editContent, onChangeEditContent] = useInput(content);
+
+  const EditCommentBtn = () => {
+    setState(true);
+  };
+  // console.log(state);
+
+  const [editComment, setEditComment] = useState(content); // dom 건드리지 않고 입력된 댓글 내용 값 가져오기 위함
+  const [nickname, setNickname] = useState();
+
+  ////
+  const handleUpdateComment = () => {
+    const newCommentPost = [...post.Comments];
+    // const commentOne = newCommentPost.find((comment) => comment.User.nickname === nickname);
+    // console.log(User.nickname);
+    // commentOne.content = content;
+    // setEditComment(newCommentPost);
+    onChangeEditContent(editContent);
+    // console.log(editComment);
+  };
+  ////
+  const CloseEditCommentBtn = () => {
+    setState(false);
+    if (editContent === content) {
+      return;
+    } else if (!editContent) {
+      handleUpdateComment(nickname, editContent, myComment);
+    }
   };
 
   return (
@@ -30,14 +52,14 @@ function Comment(props) {
           </p>
           <p>
             댓글 내용:
-            {commentBoxState ? (
-              <textarea onChange={onSaveChangeEditComment}>{item.content}</textarea>
+            {state ? (
+              <textarea onChange={onChangeEditContent}>{item.content}</textarea>
             ) : (
               <span>{item.content}</span>
             )}
           </p>
           <S.Flex>
-            <button onClick={state ? CloseEditCommentBtn : editCommentBtn}>수정</button>
+            <button onClick={state ? CloseEditCommentBtn : EditCommentBtn}>수정</button>
             <button>삭제</button>
           </S.Flex>
         </>

@@ -66,6 +66,10 @@ function State2() {
   const [user, setUser] = useState();
   const [comment, setComment] = useState();
 
+  for (let i = 0; i < post.Comments.length; i++) {
+    post.Comments[i].id = i;
+  }
+
   const onChangeUserInputValue = (e) => {
     setUser(e.target.value);
   };
@@ -85,49 +89,6 @@ function State2() {
     newObj.myComment = true;
     newCommentAddPost.Comments.push(newObj);
     setPost(newCommentAddPost);
-  };
-
-  /////////////////////////////////////////////////
-  const [state, setState] = useState(false); // [수정] 버튼 삼항연산자 (true / false)
-  const [commentBoxState, setCommentBoxState] = useState(false);
-  const [editComment, setEditComment] = useState(comment); // dom 건드리지 않고 입력된 댓글 내용 값 가져오기 위함
-  const [nickname, setNickname] = useState();
-
-  const editCommentBtn = () => {
-    setState((prev) => !prev);
-    setCommentBoxState(true);
-    console.log(post.Comments);
-    // const whoseComment = post.Comments.find((item) => item.User.current.nickname == nickname);
-    // console.log('훔', whoseComment);
-    const arr = [];
-    for (let i = 0; i < post.Comments.length; i++) {
-      arr.push(post.Comments[i].User.nickname);
-    }
-    console.log(arr); // ['김사과', '반하나', '오렌지', '이멜론', '박수박']
-
-    // const selectedOne = post.Comments.find((item) => item.User == '김사과');
-
-    // if (commentBoxState == true) {
-    //   if (editComment == comment) {
-    //     setCommentBoxState(false);
-    //   } else {
-    //     setComment(editComment);
-    //   }
-    // }
-  };
-
-  const CloseEditCommentBtn = () => {
-    setState((prev) => !prev);
-
-    if (comment == editComment) {
-      console.log(comment);
-      console.log(editComment);
-      setCommentBoxState(false);
-    } else if (comment != editComment) {
-      setComment(editComment);
-      setCommentBoxState(false);
-      console.log(comment);
-    }
   };
 
   return (
@@ -159,17 +120,7 @@ function State2() {
       <S.CommentList>
         {/* list */}
         {/* 예시 데이터 */}
-        <Comment
-          post={post}
-          editComment={editComment}
-          setEditComment={setEditComment}
-          editCommentBtn={editCommentBtn}
-          CloseEditCommentBtn={CloseEditCommentBtn}
-          commentBoxState={commentBoxState}
-          state={state}
-          nickname={nickname}
-          setNickname={setNickname}
-        />
+        <Comment post={post} />
       </S.CommentList>
     </S.Wrapper>
   );
