@@ -1,7 +1,8 @@
-import { useNavigate } from "react-router-dom";
-import styled from "styled-components";
-import ProductCard from "../../components/2.state/product";
-import productList from "../../__mock__/products.json";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
+import ProductCard from '../../components/2.state/product';
+import productList from '../../__mock__/products.json';
 
 function State3() {
   /*
@@ -39,13 +40,14 @@ function State3() {
     4.  상세 페이지에서는 페이지의 상세 내용을 확인할 수 있으며
         구매평을 추가할 수 있습니다 (수정 및 삭제는 state2에서 풀이하였으므로 구현하지 않아도 괜찮습니다)
   */
-
-  console.log(productList);
+  const { products } = productList;
+  console.log(productList); // {products: Array(3)}
+  console.log(products); // (3) [{…}, {…}, {…}]
 
   const navigate = useNavigate();
 
-  const onNavigateDetailPage = () => {
-    navigate(`/state/detail/1`);
+  const onNavigateDetailPage = (prNo) => {
+    navigate(`/state/detail/${prNo}`);
   };
 
   return (
@@ -55,7 +57,9 @@ function State3() {
       <ul>
         {/* list */}
         {/* 예시 데이터 */}
-        <ProductCard onNavigate={onNavigateDetailPage} />
+        {products.map((products, index) => {
+          return <ProductCard onNavigate={onNavigateDetailPage} products={products} />;
+        })}
       </ul>
     </>
   );

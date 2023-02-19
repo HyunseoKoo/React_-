@@ -62,13 +62,10 @@ function State2() {
       },
     ],
   });
+  const { Comments } = post;
 
   const [user, setUser] = useState();
   const [comment, setComment] = useState();
-
-  for (let i = 0; i < post.Comments.length; i++) {
-    post.Comments[i].id = i;
-  }
 
   const onChangeUserInputValue = (e) => {
     setUser(e.target.value);
@@ -118,9 +115,9 @@ function State2() {
         <button onClick={onAddCommentBtn}>댓글 작성</button>
       </div>
       <S.CommentList>
-        {/* list */}
-        {/* 예시 데이터 */}
-        <Comment post={post} />
+        {Comments.map((Comments) => (
+          <Comment Comments={Comments} />
+        ))}
       </S.CommentList>
     </S.Wrapper>
   );

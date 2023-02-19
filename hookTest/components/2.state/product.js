@@ -1,14 +1,19 @@
-import styled from "styled-components";
+import { useParams } from 'react-router-dom';
+import styled from 'styled-components';
 
-function ProductCard({ onNavigate }) {
+function ProductCard({ products, onNavigate }) {
+  const { productNumber } = products;
+  console.log(onNavigate);
+  console.log(productNumber);
+
   return (
-    <S.Item onClick={onNavigate}>
-      <h4>구멍난 양말</h4>
-      <p>상품번호: 302012</p>
-      <p>가격: 3000원</p>
-      <p>사이즈: X, M, L</p>
-      <p>평점: 4.5</p>
-      <p>리뷰: 14</p>
+    <S.Item onClick={() => onNavigate(productNumber)}>
+      <h4>{products.productName}</h4>
+      <p>상품번호 : {products.productNumber}</p>
+      <p>가격: {products.productPrice}</p>
+      <p>사이즈: {products.productSize}</p>
+      <p>평점: {products.productRating}</p>
+      <p>리뷰: {products.productPrice}</p>
     </S.Item>
   );
 }
