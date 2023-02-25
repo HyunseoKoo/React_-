@@ -1,10 +1,6 @@
 컨텍스트: 전역으로 state(상태)를 전달하기 위한 것
 리듀서: 상태의 비즈니스 로직을 밖으로 빼내기 위한것
 
-dayjs ㅇ
-luxon
-
-83ac3bc139060adf9799326048ea6950fe507907
 
 useReducer 을 사용했을 때의 가장 큰 장점은 컴포넌트 업데이트 로직을 컴포넌트 바깥으로 빼낼 수 있다는 점 입니다.
 
@@ -101,7 +97,7 @@ const initialState = [
 	   (따라서, const [userList, setUserList] = useContext(UserContext) 로 구조분해해서 쓸수 있음)	=> userList에 첫번째 인덱스값인 state, setUserList에 두번째 인덱스값인 setState 들어가짐 [구조분해?]
 
 4) [components]폴더 > [user]폴더 > userList파일에 const [userList] = useContext(UserContext); 가져다 씀. 그럼 기존에 props로 받은 {userList} 삭제 가능
-										                           -----------  ------------- 두개 다 import 해줘야함!
+										     ------------  ------------- 두개 다 import 해줘야함!
 
 
 [Reduce 만들기] => 전역 상태를 관리하는 로직은 따로 빼자! 왜? 전역상태는 다른 컴포넌트에서 쓰려고 쓰는거니까, 어차피 변경하는 로직도 재사용하잖아, 그 재사용 로직을 reducer로 따로빼서 한꺼번에 관리하자!
@@ -110,15 +106,69 @@ const initialState = [
  5) const [state, setState] = useState(inintialState); 를 reducer로 관리!
  user파일에서 다음과 같이 변경
 
+ (7번) export const UserDisPatchContext = createContext();	=> 새로운 전역 저장소를 하나 더 만듦.
+
+ (9번) export const UserDisPatchContext = () => useContext(UserDisPatchContext);		=> UserDisPatchContext도 useContext로 가져다 쓸수 있게 변수화! [redux가 이렇게 나눠서 씀]
+
+ (3번) 전역에 쓰일 타입의 오타 방지를 위해 스트링을 변수화함!
+	export const ADD_STATE = "ADD_STATE";
+	export const REMOVE_STATE = "REMOVE_STATE";
+
 // (2번) reducer함수 만들기
 const userListReducer = (state, action) => {
-	switch(action.type){
-	   case 
+	(4번) switch(action.type){
+	   case ADD_STATE:
+		return [...state, {id:action.payload.id. , name: action.payload.name}];
+	   case REMOVE_STATE:
+		return state.filter((user)=> user.id !== action.payload.id);
+	   default:
+		return;
+   }
+};
 
  const ContextProvider = ({children}) => {
 		// const [state, setState] = useState(initialState); => 이거를 
-		const [state, dispatch] = useReducer("", initialState) => 이렇게 교체하고 나서! (1번)
-		return <UserContext.Provider value={[state, setState]}>{children}</UserContext.Provider> 
+		const [state, dispatch] = useReducer( (5번)"userListReducer", initialState) => 이렇게 교체하고 나서! (1번)
+		return <UserContext.Provider value={(6번){state}}>		 =>(6번) value={} 안에 들어갈 값을 [state,setState]에서 {state}로 변경
+			(8번) <UserDisPatchContext.Provider value={dispatch}>{children}</UserDisPatchContext.Provider>	=> Dispatch 프로바이더를 하나더 추가해줌
+			</UserContext.Provider>
 	}; 	
 	export default ContextProvider;	
 
+ 6) [components]폴더 >  [user]폴더 > index파일
+	User() 함수에서 const userList = useUserState()로 변경.  => 원래는 const [userList, setUserList]였는데, 더이상 배열이 아니니까 userList로 변경 (???)
+			    const disaptch = useUserDisaptch(); 추가.
+	
+ 7) [components]폴더 >  [user]폴더 > userList파일
+	UserList()함수에서 동일하게 배열값 대신 userList로 변경
+
+ 8) [components]폴더 >  [user]폴더 > index파일
+	이제 안에 있는 로직을 dispatch로 전달하기만 하면 됨
+	const onDeleteUser = (id) => {
+	   type: REMOVE_STATE,
+	   payload: {
+	     id,
+	   }
+	})
+
+	const onAdduser = (name) => [
+	   const id = userList[userList.length - 1].id + 1;
+	   dispatch({
+		type: ADD_STATE,
+		payload: {
+		   id,
+		   name,
+		},
+	   });
+	};
+
+ 9) [utils]폴더 생성
+    export function createAction(type){		=> createAction 리턴값이 함수. 
+	return function (payload) {
+	   return {type, payload };
+	};
+    }
+	=> index파일의 dispatch 액션 부분을 더욱 간단하게 표현할수 있게 해줌
+	onAdduser 함수부분에 dispatch(ADD_STATE({ id, name })); 으로 표현 가능	=> dispatch함수 안에 있는 함수형태의 매개변수 ADD_STATE가 createAction함수의 매개변수인 type이 되고, {id, name}이 payload가 됨...?
+
+		** [총정리] createAction이 함수를 반환하고,  createAction의 매개변수 값이 객체의 type값이 되고, createAction이 반환하는 그 함수의 매개변수 값이 payload가 된다!!
