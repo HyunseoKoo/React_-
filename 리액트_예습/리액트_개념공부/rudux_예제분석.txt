@@ -1,81 +1,214 @@
-[Redux 사용법]
-1. npm i react react-redux 설치
-2. [reducer]폴더에 index파일 만들어서 export const rootReducer = combineReducers({}); 만들어줌. 이 combineReducer가 reducer들을 루트로 하나로 만들어줄것(?)
-3. App.js 파일의 App()함수에 const store = createStore(rootReducer); 만들어서 rootReducer 적용시켜줌. 	=> createStore라는 저장소를 만들어서 그 안에 rootReducer를 넣어준 것!
-4. return 부분에 <Provider> </Provider>를 만듦. 그리고 store라는 키로 3번에서 만든 store값을 넣어줌.
-=> 이러면 reducer & context 적용 끝. provider 만들고 store 가져다 쓰는 것!
-5. [store]폴더의 store파일 만들어서 const store = createStore(rootReducer) 만듦.
-6. App.js 파일에서 Provider의 키 값으로 store={store}  줌.
-7. [reducer] 폴더안에 reducer라는 파일을 만들어서 reducer 만들어줌.
-ex)
-const initialState = [
-  {
-    id: 1,
-    name: '김성용',
-    age: 20,
-    height: 190,
-  },
-];
 
-// state 초기값을 매개변수에 적는다는 점만 다름!!
-const reducer = (state = initialState, action) => {
-  switch (action.type) {
-    case 'ADD_USER':
-      return [action.payload, ...state];
-    default: // 디버깅용
-      console.log('지정된 타입이 없습니다.');
-      return state;
-  }
-};
-export default reducer;
+ redux (리덕스) 라이브러리
 
-8. [reducer]폴더 index.js 파일에 방금 만든 user함수를 import해서 써줌. export const rootReducer = combineReducers({ user }); 	=> {user}라고 써줌으로써 user.js파일에 만든 reducer를 구조분해해서 가져옴.(?)
-9. [user]폴더 List.js 파일에 useSelector를 이용해서 rootReducer에 만들어놓은 {user} reducer를 사용.
-ex)
-import { useSelector } from 'react-redux';
+    useReducer & useContext 기반으로 만들어진 전역 상태 관리 라이브러리
 
-const UserList = () => {
-  const userList = useSelector((state) => state.user); // 여기서 (state)는 rootReducer 전체를 가지고 옴. state.user는 rootReducer 안에 있는 객체 중 {user}를 가지고 와서, user에 넣었던 기본값 state(initialState)가 옴
-  //   console.log(userList); // {id: 1, name: '김성용', age: 20, height: 190} 배열
+    dev-tools, logger middle ware --> 편의성 증대
 
-  return (
-    <>
-      {userList.map((user) => (
-        <div>
-          {user.id}. {user.name}
-        </div>
-      ))}
-    </>
-  );
-};
-export default UserList;
+    - 리덕스의 치명적인 단점 ?
+        길어지는 보일러 코드 (기본 코드)
 
-10. [user]폴더의 Form.js 파일에 가서 등록하는 함수를 만들어 줄 것
+        단점을 보완하기위하여 mobx recoil 등이 출현
+        
+        RTK (Redux Tool kit) ==> 리덕스의 보일러코드 단점을 보완 최신판
 
-11. [미들웨어 기능 사용을 위한 추가 라이브러리 설치]
-npm i redux-devtools-extension
-npm i redux-logger
 
-12. 이를 [store]폴더의 store파일에 적용
- reduxConfig함수의 createStore에 composeWithDevTools(applyMiddleware(logger)) 추가
-ex)
-import { applyMiddleware, createStore } from 'redux';
-import { rootReducer } from '../reducer';
-import { composeWithDevTools } from 'redux-devtools-extension';
-import logger from 'redux-logger';
+    설치
+        npm i redux react-redux
 
-const reduxConfig = () => {
-  const store = createStore(rootReducer, composeWithDevTools(applyMiddleware(logger)));		=> 데브툴즈랑 미들웨어랑 같이 쓰겠다고 하는 것!
-  return store;
-};
+=======================================================================================
 
-// export const store = createStore(rootReducer);
-// 같은 표현. 지금은 로직에서는 이게 더 편한 표현이지만 추후 중간에 미들웨어 관련된 함수를 실행해야 될수도 있어서 위의 함수로 사용.
+*****사용법*****
 
-export default reduxConfig;
+redux는 createContext를 provider로 내려주는 과정이 없다.    [context는 여러가지 기능이 있음?]
 
-13. 개발자용/사용자용 확인 화면 나누기(????)
-App.js 파일에 console.log(process.env.NODE_ENV); 추가
+1. [reducer]폴더를 만들어서 여러 reducer들을 이 곳에 작성/관리한다.
+   index.js파일에 rootReducer(변수)를 redux에 등록시켜준다. 그러면 자동으로 store를 만들어준다. (combineReducers({})를 통해)
+   => import {combineReducers} from 'redux'
+      
+      export const rootReducer = combineReducers({})    // reducer가 모여있는 집합 저장소(rootReducer)를 combineReducers라는 redux 속성으로 만들어준 것
+
+2. App.js로 이동하여 store를 만들어 createStore에 rootReducer를 등록해준다.
+   => import { createStore } from "redux;
+      import { rootReducer } from './reducer'; 
+   
+      function App() {
+      const store = createStore(rootReducer)      // createContext와 같이 redux 저장소를 만든 다음, reducer들이 합쳐져있는 rootReducer를 담아준 것
+
+      return(
+          <User/>
+      );
+     }
+
+3. Provider를 import하여 return부분에 씌워주고, store라는 키로 내가 만든 store 값을 넣어준다.
+   => import { createStore } from 'redux';
+      import { Provider } from 'react-redux';
+      import { rootReducer } from './reducer'; 
+   
+      function App() {
+      // const store = createStore(rootReducer)     (4번 세팅했으면 해당 부분은 지워줘야 한다.)
+
+      return(
+        <Provider store={store}                 // Provider 덮개 만들고 키값으로 rootReducer 데이터 전달해준 것
+          <User/>
+        </Provider>
+      );
+     }
+----------------------------------------------------------------------- 여기까지가 context만들고 reducer 전달 끝난 것으로, 둘 다 한번에 적용한 것이다.
+
+4. redux는 다양한 기능(미들웨어)를 가지고 있어 store 관련 설정을 다른 곳에 빼놓는게 단일책임원칙을 지키기 좋다. (?)
+   store폴더에 store.js 파일 만들고 위에서 rootReducer를 담을 store를 세팅해 준다.
+   => import { createStore } from 'redux'
+      import { rootReducer } from '../reducer'
+
+      const reduxConfig = () => {       
+        const store = createStore(rootReducer);
+        return store;                           
+      }
+
+      // export const store = createdStor(rootReducer) 와 같은 기능이나, 나중에 redux-saga와 같은 미들웨어 관련된 함수를 쓸수 있어서, 함수형으로 return하는게 나아 위와 같이 return store로 쓴다.
+      export default reduxConfig; 
+
+5. store를 컴포넌트화 하였으니, App.js에서 작성한 기존 store는 삭제하고, App.js파일에서 export한 reduxConfig() 함수실행 형태로 store를 변수 선언해준디ㅏ.
+   reduxConfig를 import해준다.
+   => import { createStore } from 'redux';
+      import { Provider } from 'react-redux';
+      import { rootReducer } from './reducer'; 
+      import reduxConfig from './store/store';
+   
+      function App() {
+      // const store = createStore(rootReducer)     (4번 세팅했으면 해당 부분은 지워줘야 한다.)
+      const store = reduxConfig();
+
+      return(
+        <Provider store={store}>  
+          <User/>
+        </Provider>
+      );
+     }
+----------------------------------------------------------------------- 여기까지가 redux 적용한 것이다.
+
+6. reducer폴더에 reducer를 쓸 user.js파일을 만든다.
+   initialState 만든다.
+   => const initialState = [
+    {
+        id:1,
+        name:"구현서",
+    }
+   ]
+
+   const reducer = (state = initialState, action) => {
+
+    switch (action.type) {
+        case "ADD_USER":
+            return [action.payload, ...state]
+        default:
+            console.log("지정된 타입이 없습니다.")  // 나를 위한 디버깅 확인용
+            return state;
+    }
+   }
+   export default reducer;
+
+7. reducer를 만든 후, reducer들을 합쳐주는 rootReducer에 등록을 한다.
+   reducer폴더의 index.js로 이동.
+   => import { combineReducers } from 'redux'
+      import user from './user'         // 직접 적어서(자동세팅 XXX)!!!! user.js파일에서 export한 reducer(변수명 reducer)를 구조분해 할당을 통해 user라는 변수명으로 import하고,
+
+      export const rootReducer = combineReducers({user})    // 객체 안에 reducer들을 넣어준다.
+
+8. reducer를 rootReducer에 등록했으니, 이제는 필요한 컴포넌트로 이동하여 사용하면 된다.
+   user폴더의 List.js 파일로 이동
+   => import { useSelector } from 'react-redux'     // react-redux 라이브러리의 속성인 useSelector를 import해준다.
+   
+   const UserList = () => {
+        const userList = useSelector((state)=>state.user)   // useSelector를 쓰게되면 rootReducer에 등록된 모든 reducer를 가지고 온다.
+                                      ----- rootReducer에 등록된 state로 이 state 안에 모든 reducer들이 담겨 있다. 이를 state.user[rootReducer는 객체로, user:user 형태임. 구조분해로 user라는 키를 통해 user값에 접근]를 통해 reducer들 중 user reducer만 가져온다.
+        console.log(userList);      // 콘솔창에서 state.user의 기본값인 initialState 값을 확인할 수 있다. [{id:1, name:"구현서", age:20, height: 165}]
+    
+       return (
+           <>
+                {userList.map((user) => {
+                    return <div>{user.id}. {user.name}</div>        // 위에서 작성한 userList 변수 활용하여 map 돌려준다.
+                })}
+           </>
+       )
+    }
+   export default UserList
+
+9. 컴포넌트 파일에서 reducer 사용시, 'react-redux' 속성인 useDispatcher를 사용하여 rootReducer에 action을 전달한다.
+   user폴더에 Form.js 파일 만든다.
+   => import { useDispatcher } from 'react-redux'   // useDispatcher를 import한다.
+      import { useRef } from 'react'
+
+   const UserAddForm = () => {
+        const dispatch = useDispatcher();       // useDispatcher를 통해 dispatch의 action을 rootReducer로 보낼수 있다.
+        const name = useRef(null);
+
+        const onAddUser = () => {
+            dispatch({
+                type: "ADD_USER",
+                payload: {
+                    id: Math.floor(Math.random()*100000),
+                    name: name.current.value
+                }
+            })
+        }
+        return (
+            <>
+                <input ref={name}/>
+                <button onClick={onAddUser}>추가</button>
+            </>
+        )
+   } 
+   export default UserAddForm
+
+----------------------------------------------------------------------- 이제부터 미들웨어 사용법
+
+10. 미들웨어를 설치한다.
+    미들웨어: A와 B라는 데이터 통로 중간에 데이터를 관리하는(?) 친구
+    redux-devtools 사용법 ?
+    터미널에서 [npm i -D redux-devtools-extension redux-logger] 설치한다.
+    (여기서 -D는 Dependency(?)로 사용자는 해당 라이브러리를 확인하거나 다운받지 못하게 한다.)
+
+11. store폴더의 store.js파일에서 미들웨어를 작성한다.
+    createStore를 통해 미들웨어 저장소를 만든다. 
+    => import { applyMiddleware, createStore } from 'redux'
+    import { rootReducer } from '../reducer'
+    import { composeWithDevTools } from 'redux-devtools-extension';     // redux-devtools-extension의 속성인 composeWithDevTools를 import한다.
+    import logger from 'redux-logger'       // composeWithDevTools와 함께 직접 적어서 import한다!!
+
+    const reduxConfig = () => {
+        const store = createStore(rootReducer, composeWithDevTools(applyMiddleware(logger)));   // composeWithDevTools는 devTools를 사용하겠다는 의미이고, applyMiddleware를 적용하겠다는 것 [같이 쓸래!] 
+        return store;
+    }
+    export default reduxConfig;
+
+12. Chrome 확장 프로그램을 통해 redux 프로그램을 다운받는다. 현재 state를 보여주는 역할을 한다.
+    redux 확장 프로그램을 통해 현재 state를 확인한다.
+    콘솔창을 확인하지 않아도 되며 에러 추적이 쉬워져 디버깅을 도와준다.
+
+13. App.js파일에 가서 console.log(process.env.NODE_ENV); 를 작성한다.
+
+    1) development
+        개발자용 (npm start 하면 development가 콘솔창에 찍힘)
+
+    2) production
+        npm build -> 생성된(번들링 된 _ node modules 안보이는..?) -> 사용자가 보게 될 화면
+
+    현재는 npm start 실행했기 때문에 콘솔창에 development가 확인된다.
+
+14. store폴더 store.js파일에 process.env.NODE_ENV === "development' && 해당 내용을 추가한다.
+    => import { applyMiddleware, createStore } from 'redux'
+    import { rootReducer } from '../reducer'
+    import { composeWithDevTools } from 'redux-devtools-extension';     /
+    import logger from 'redux-logger'  
+
+     const reduxConfig = () => {
+        const store = createStore(rootReducer,
+            process.env.NODE_ENV === "development" && composeWithDevTools(applyMiddleware(logger))  //process.env.NODE_ENV === "development" && 를 안써주면, build 모드에서 import { composeWithDevTools } from 'redux-devtools-extension';를 할수 없음.
+        );
+        return store;
+    }
 
 14. npm run build  => 노드모듈스 등 무거운 파일들을 경량화시켜서 사용자가 접속할수 있게 배포하기 위함 (배포용)
 
