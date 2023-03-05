@@ -1,0 +1,223 @@
+
+    전역 상태 관리
+
+        react에서 가상 돔이 변화를 인지할 수 있게 해주는 값 = state
+        props로 전달하는 값이 깊이가 깊어질(하위 컴포넌트가 많을수록) 수록
+        오류 상황에서부터 에러를 추적하기가 어려워집니다.
+
+        ex) (props)------------------------------------------->(props)
+            상위 컴포넌트 -> 하위컴포넌트 -> 하위 -> 하위 -> 하위(data)
+
+
+        * 전역 관리
+            모든 컴포넌트에서 사용해야하는 상태를 독립적으로 관리하여
+            어떠한 곳에서도 해당 파일(store)에서 불러서 사용할 수 있도록
+
+-----------------------------------------------------------------------------------
+
+    flux 패턴 이란?
+
+    ( MVC 패턴 (Model, View, Controller) )
+
+    action -> dispatcher -> Model(store) -> view [데이터가 단방향으로 흐르는 것을 활용하여 데이터 추적을 쉽게함.]
+
+        * action -> 변경할 데이터 객체, dispatcher를 통해서 store에 전달
+        * dispatcher -> 데이터 흐름을 관리 (통로, 전달, 매개체)
+        * store -> 상태(state)의 저장소, state를 변경할 수 있는 함수 또한 가지고 있음
+        * view -> 화면
+        
+-----------------------------------------------------------------------------------
+
+    useReducer
+        - 상태 변경 혹은 업데이트하는 로직을 컴포넌트에서 분리
+
+    useContext
+        - 전역 상태 관리 위한 도구, 기능 자체는 redux와 동일
+        - 보통은 업데이트 로직을 관리할 수 있는 reducer와 함께 사용
+        - oop를 활용한 프론트엔드 DI(의존성 주입)에 응용 가능
+
+-----------------------------------------------------------------------------------
+
+    redux
+    redux-toolkit
+    redux-saga
+
+-----------------------------------------------------------------------------------
+
+    전역 상태관리 필요성 -> hook함수(useReducer, useContext) -> flux 패턴 기반
+    ===> 조금더 편리하게 만들기 위한 redux와 같은 라이브러리 (redux / redux-toolkit / redux-saga)
+
+컨텍스트: 전역으로 state(상태)를 전달하기 위한 것
+리듀서: 상태의 비즈니스 로직을 밖으로 빼내기 위한것
+
+
+useReducer 을 사용했을 때의 가장 큰 장점은 컴포넌트 업데이트 로직을 컴포넌트 바깥으로 빼낼 수 있다는 점 입니다.
+
+------------------------------------------------------------------------------------------------------------------------------
+[react > reducer]
+1. [components]폴더 > [counter]파일에 useReducer 사용
+function Counter() {
+const [count, dispatch] = useReducer(countReducer, 0);
+
+const onIncrementCount = () => {
+   dispatch({
+	type: 'INCREMENT',
+	count: 1,
+   });
+};
+
+const onDecrementCount = () => {
+   dispatch({
+	type: 'DECREMENT',
+	count: 1,
+   });
+};
+
+return (
+   <>
+	<button onClick={onIncrementCount}>+</button>
+	{count}
+	<button onClick={onDecrementCount}-</button>
+
+
+2. [reducer]폴더 > countReducer 함수 만듦 (useReducer의 dispatch가 전달할 함수 (매개변수 state는 useReducer에서 갖는 초기값 변수, action은 dispatch가 전달한 객체_action.type & action.count))
+export const countReducre = (state, action) => {
+   switch (action.type) {
+	case 'INCREMENT':
+	   return state + action.count;
+	case 'DECREMENT':
+	   return state - action.count;
+	default:
+	   return state;
+   }
+};
+
+------------------------------------------------------------------------------------------------------------------------------
+
+1. [components]폴더 > [user]폴더 > userList 파일 만듦
+ userList를 뿌려주는 역할
+2. [components]폴더 > [user]폴더 > addUser 파일 만듦
+
+
+
+[context 만들기]
+3. [context]폴더 > user파일 만듦
+const initialState = [
+  {
+    id: 1,
+    name: '김성용',
+  },
+  {
+    id: 2,
+    name: '구현서',
+  },
+  {
+    id: 3,
+    name: '김태기',
+  },
+  {
+    id: 4,
+    name: '김민식',
+  },
+];
+
+ 1) createContext() => 전역 저장소를 만듦
+ 	export const UserContext = createContext();
+	export const useUserState = useContext(UserContext);	=> userUserState를 어떤 컴포넌트에서 가져다쓰면, userContext라는 (비어있는) 저장소의 데이터에 접근하겠다!
+	const ContextProvider = ({children}) => {
+		const [state, setState] = useState(initialState);	=> initialState를 state화 한 것.
+		return <UserContext.Provider value={[state, setState]}>{children}</UserContext.Provider> 	=> UserContext라는 비어있는 저장소에 initialState라는 값을 채워넣음!
+	}; 	=> UserContext가 모든 컴포넌트와 공유됨!
+	export default ContextProvider;		=> UserContext가 모든 컴포넌트와 공유될수 있도록 해주는 함수 ContextProvider를 바깥으로 내보내고, 모든 컴포넌트가 만나는 App.js에 가져다 씀!
+
+ 2) App.js 파일에 ContextProvdier 세팅
+	function App() {
+	   return (
+		<ContextProvider>
+		   <div className="App">
+			<User />
+		   </div>
+	 	</ContextProvider>
+	   );
+	}
+ 3) useReducer 사용 => 전역 상태 관리를 위해 밖에서 state 관리	[user]폴더 > index파일로 이동
+	fucntion User(){
+	   const userList = useContext(UserContext);		// userList를 콘솔로 찍으면 (2) [Array(4), f] => 길이가 2인 배열. 0번째 인덱스에는 initial값으로 넣어던 이름 객체배열, 1번째 인덱스에는 state로 관리해주는 값
+	   (따라서, const [userList, setUserList] = useContext(UserContext) 로 구조분해해서 쓸수 있음)	=> userList에 첫번째 인덱스값인 state, setUserList에 두번째 인덱스값인 setState 들어가짐 [구조분해?]
+
+4) [components]폴더 > [user]폴더 > userList파일에 const [userList] = useContext(UserContext); 가져다 씀. 그럼 기존에 props로 받은 {userList} 삭제 가능
+										     ------------  ------------- 두개 다 import 해줘야함!
+
+
+[Reduce 만들기] => 전역 상태를 관리하는 로직은 따로 빼자! 왜? 전역상태는 다른 컴포넌트에서 쓰려고 쓰는거니까, 어차피 변경하는 로직도 재사용하잖아, 그 재사용 로직을 reducer로 따로빼서 한꺼번에 관리하자!
+			  전역 상태를 관리하는 로직은 어차피 전역상태니까 따로 빼서 쓰자!!
+
+ 5) const [state, setState] = useState(inintialState); 를 reducer로 관리!
+ user파일에서 다음과 같이 변경
+
+ (7번) export const UserDisPatchContext = createContext();	=> 새로운 전역 저장소를 하나 더 만듦.
+
+ (9번) export const UserDisPatchContext = () => useContext(UserDisPatchContext);		=> UserDisPatchContext도 useContext로 가져다 쓸수 있게 변수화! [redux가 이렇게 나눠서 씀]
+
+ (3번) 전역에 쓰일 타입의 오타 방지를 위해 스트링을 변수화함!
+	export const ADD_STATE = "ADD_STATE";
+	export const REMOVE_STATE = "REMOVE_STATE";
+
+// (2번) reducer함수 만들기
+const userListReducer = (state, action) => {
+	(4번) switch(action.type){
+	   case ADD_STATE:
+		return [...state, {id:action.payload.id. , name: action.payload.name}];
+	   case REMOVE_STATE:
+		return state.filter((user)=> user.id !== action.payload.id);
+	   default:
+		return;
+   }
+};
+
+ const ContextProvider = ({children}) => {
+		// const [state, setState] = useState(initialState); => 이거를 
+		const [state, dispatch] = useReducer( (5번)"userListReducer", initialState) => 이렇게 교체하고 나서! (1번)
+		return <UserContext.Provider value={(6번){state}}>		 =>(6번) value={} 안에 들어갈 값을 [state,setState]에서 {state}로 변경
+			(8번) <UserDisPatchContext.Provider value={dispatch}>{children}</UserDisPatchContext.Provider>	=> Dispatch 프로바이더를 하나더 추가해줌
+			</UserContext.Provider>
+	}; 	
+	export default ContextProvider;	
+
+ 6) [components]폴더 >  [user]폴더 > index파일
+	User() 함수에서 const userList = useUserState()로 변경.  => 원래는 const [userList, setUserList]였는데, 더이상 배열이 아니니까 userList로 변경 (???)
+			    const disaptch = useUserDisaptch(); 추가.
+	
+ 7) [components]폴더 >  [user]폴더 > userList파일
+	UserList()함수에서 동일하게 배열값 대신 userList로 변경
+
+ 8) [components]폴더 >  [user]폴더 > index파일
+	이제 안에 있는 로직을 dispatch로 전달하기만 하면 됨
+	const onDeleteUser = (id) => {
+	   type: REMOVE_STATE,
+	   payload: {
+	     id,
+	   }
+	})
+
+	const onAdduser = (name) => [
+	   const id = userList[userList.length - 1].id + 1;
+	   dispatch({
+		type: ADD_STATE,
+		payload: {
+		   id,
+		   name,
+		},
+	   });
+	};
+
+ 9) [utils]폴더 생성
+    export function createAction(type){		=> createAction 리턴값이 함수. 
+	return function (payload) {
+	   return {type, payload };
+	};
+    }
+	=> index파일의 dispatch 액션 부분을 더욱 간단하게 표현할수 있게 해줌
+	onAdduser 함수부분에 dispatch(ADD_STATE({ id, name })); 으로 표현 가능	=> dispatch함수 안에 있는 함수형태의 매개변수 ADD_STATE가 createAction함수의 매개변수인 type이 되고, {id, name}이 payload가 됨...?
+
+		** [총정리] createAction이 함수를 반환하고,  createAction의 매개변수 값이 객체의 type값이 되고, createAction이 반환하는 그 함수의 매개변수 값이 payload가 된다!!

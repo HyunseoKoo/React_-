@@ -1,0 +1,39 @@
+[useState]
+1. const [state, setState] = useState(초기값)
+  => setState를 통해 state 값을 변경할때마다 새로 렌더링 된다.
+
+2. state를 변경할 때 새로 변경될 state값이 이전 state값과 연관이 되어 있다면, setState의 인자로 새로운 state를 리턴하는 콜백함수를 사용한다.
+  => setState((prevState)=> {
+        return [inputValue, ...prevState];
+  })
+
+3. useState를 활용해서 초기값을 받아올때 어떤 무거운 일을 해야한다면 useState의 인자로 콜백함수를 넣어주면 맨 처음 랜더링이 될때만 실행될수 있게 한다.
+
+[useEffect]
+1. 랜더링 될때 마다 매번 실행
+useEffect(() => {
+    // 작업...
+});
+
+2. 화면에 첫 렌더링 될때 실행, value 값이 바뀔때 실행
+useEffect(() => {
+    // 작업...
+}, [value])
+
+2-1. []이 빈 배열일 경우, 화면에 첫 렌더링 될때에만 실행
+useEffect(() => {
+    // 작업...
+}, [])
+
+** 사용하는 경우 **
+useEffect에서 어떤 서비스를 구독하는 작업을 했다면, 서비스 구독 취소 작업을 해야할 때
+
+
+[useRef]
+1. 저장공간
+ (기본) state의 변화 -> 렌더링 -> 컴포넌트 내부 변수들 초기화
+ (useRef 사용시) Ref의 변화 -> No 렌더링 -> 변수들의 값이 유지됨 [state보다 ref를 사용할 경우 불필요한 렌더링 막을 수 있음]
+                 State의 변화 -> 렌더링 -> 그래도 Ref의 값은 유지됨 [변경시 렌더링을 발생시키지 않아야 말아야하는 값을 다룰 때 편리함]
+
+2. DOM 요소에 접근
+ ref -> focus() -> input요소
