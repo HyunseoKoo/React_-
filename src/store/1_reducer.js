@@ -5,10 +5,13 @@ export const addMenuReducer = (state, action) => {
     case 'ADD_MENU':
       return [
         ...state,
-        { id: state.length + 1, name: action.payload.name, price: action.payload.price },
+        { id: Math.random() * 1000, name: action.payload.name, price: action.payload.price },
       ];
     case 'DELETE_MENU':
       // const selectedItem = state[action.menuIndex];
       return state.filter((item) => item.id !== action.payload.id);
+
+    default:
+      return state;
   }
 };

@@ -1,24 +1,25 @@
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 const PostForm = ({ onSubmit }) => {
-  const dispatch = useDispatch();
-  // const title = useRef(null);
+  // const dispatch = useDispatch();
+  // const posts = useSelector((state) => state.posts);
 
-  const onAddPostForm = (e) => {
-    e.preventDefault();
-    dispatch({
-      type: 'ADD_POST',
-      payload: {
-        title: e.target[0].value,
-        content: e.target[1].value,
-      },
-    });
-  };
+  // const onAddPostForm = (e) => {
+  //   e.preventDefault();
+  //   dispatch({
+  //     type: 'ADD_POST',
+  //     payload: {
+  //       title: e.target.title.value,
+  //       content: e.target.content.value,
+  //     },
+  //   });
+  // };
+  // console.log(posts);
 
   return (
     <>
       <h2>POST-FORM</h2>
-      <form onSubmit={onAddPostForm}>
+      <form onSubmit={onSubmit}>
         <label>
           <input type="text" name="title" placeholder="제목" />
         </label>

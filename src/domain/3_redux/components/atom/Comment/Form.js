@@ -1,18 +1,21 @@
 import { useDispatch } from 'react-redux';
 
-const CommentForm = ({ onSubmit }) => {
-  const dispatch = useDispatch();
+const CommentForm = ({ onAddCommentForm, post }) => {
+  //   const dispatch = useDispatch();
+  //   const { Comments, id } = post;
 
-  const onAddCommentForm = (e) => {
-    e.preventDefault();
-    dispatch({
-      type: 'ADD_COMMENT',
-      payload: {
-        name: e.target.name.value,
-        content: e.target.content.value,
-      },
-    });
-  };
+  //   const onAddCommentForm = (e) => {
+  //     e.preventDefault();
+  //     dispatch({
+  //       type: 'ADD_COMMENT',
+  //       payload: {
+  //         name: e.target.name.value,
+  //         content: e.target.content.value,
+  //         Comments: Comments,
+  //         id: id,
+  //       },
+  //     });
+  //   };
 
   return (
     <form onSubmit={onAddCommentForm}>

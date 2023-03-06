@@ -44,7 +44,7 @@ const ContextQ2Page = () => {
   // console.log('1번 추가', userState);
 
   const onStatusAdd = (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     dispatch({
       type: 'STATUS_ADD',
     });

@@ -11,7 +11,7 @@ export const userReducer = (state, action) => {
       return [
         ...state,
         {
-          id: state.length + 1,
+          id: Math.random() * 1000,
           name: action.payload.name,
           nickname: action.payload.nickname,
         },
@@ -30,6 +30,9 @@ export const userReducer = (state, action) => {
       const isEditTrueList = state.filter((item) => item.isEdit == true);
       console.log('4번 submit', isEditTrueList);
       return isEditTrueList;
+
+    default:
+      return state;
   }
 };
 

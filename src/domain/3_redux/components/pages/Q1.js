@@ -1,15 +1,31 @@
+import { useDispatch, useSelector } from 'react-redux';
 import NavigateButton from '../../../../components/NavigateButton';
 import PostForm from '../atom/Post/Form';
 import AllPosts from '../atom/Posts';
 
 const ReduxQ1Page = () => {
-  const onSubmit = (e) => {
-    console.log('submit');
+  // const onSubmit = (e) => {
+  //   console.log('submit');
+  // };
+
+  const dispatch = useDispatch();
+  const posts = useSelector((state) => state.posts);
+
+  const onAddPostForm = (e) => {
+    e.preventDefault();
+    dispatch({
+      type: 'ADD_POST',
+      payload: {
+        title: e.target.title.value,
+        content: e.target.content.value,
+      },
+    });
   };
+  console.log(posts);
 
   return (
     <div>
-      <PostForm onSubmit={onSubmit} />
+      <PostForm onSubmit={onAddPostForm} />
       <AllPosts />
       <NavigateButton isLastPage />
     </div>

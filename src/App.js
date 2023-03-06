@@ -5,7 +5,7 @@ import ModalProvider from './store/2_context';
 import UserProvider from './store/3_context';
 
 import { Provider } from 'react-redux';
-import reduxConfig from './store/4_redux';
+import reduxConfig from './adapters/store';
 
 function App() {
   const store = reduxConfig();
