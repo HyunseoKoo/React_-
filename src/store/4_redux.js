@@ -10,8 +10,8 @@ const postsReducer = (state = initialPosts, action) => {
       return [
         {
           id: shortId.generate(),
-          title: action.payload.title, // 수정
-          content: action.payload.content, // 수정
+          title: action.payload.title, // from dispatch
+          content: action.payload.content, // from dispatch
           User: {
             id: shortId.generate(),
             nickName: faker.name.firstName(),
@@ -19,7 +19,7 @@ const postsReducer = (state = initialPosts, action) => {
           },
           Comments: [],
           createdAt: faker.date.between('2023-01-01T00:00:00.000Z', '2023-01-31T00:00:00.000Z'),
-          myPost: true, // 수정
+          myPost: true, // from dispatch
         },
         ...state,
       ];
@@ -27,38 +27,44 @@ const postsReducer = (state = initialPosts, action) => {
     case 'EDIT_POST': // reducer로 관리하기 오히려 더 어렵다고 생각
 
     case 'DELETE_POST':
-      const filterPosts = state.filter((item) => {
+      const filterPost = state.filter((item) => {
         return item.id !== action.payload.id;
       });
-      return filterPosts;
-
-    case 'DELETE_COMMENT':
+      return filterPost;
 
     // 코멘트 추가
     case 'ADD_COMMENT':
       const newPost = [...state];
-      const selectedPost = newPost.filter((item) => item.id == action.payload.id);
-      // console.log(selectedPost);
-      const selectedPostComments = selectedPost[0].Comments;
-      console.log(selectedPostComments); // Array
-      const newOneComment = {
+      const selectedPost = newPost.find((item) => item.id === action.payload.id);
+      const commentsOfselectedPost = selectedPost.Comments;
+      commentsOfselectedPost.unshift({
+        id: shortId.generate(),
+        content: action.payload.content, // from dispatch
         User: {
           id: shortId.generate(),
-          nickName: action.payload.name,
+          nickName: action.payload.name, // from dispatch
           profileImg: faker.image.image(),
         },
-        id: shortId.generate(),
-        content: action.payload.content,
-        createdAt: faker.date.between('2023-01-01T00:00:00.000Z', '2023-01-31T00:00:00.000Z'),
+
         myComment: true,
-      };
-      const newComments = [newOneComment, ...selectedPostComments];
-      console.log(newComments);
-      selectedPostComments = newComments;
+        createdAt: faker.date.between('2023-01-01T00:00:00.000Z', '2023-01-31T00:00:00.000Z'),
+      });
       return newPost;
 
+    case 'DELETE_COMMENT':
+      console.log('test');
+      // console.log(action.payload.commentId); // o
+      // console.log(action.payload.id); // undefined
+      const newPost2 = [...state]; // o
+      const selectedPost2 = newPost2.find((item) => item.id === action.payload.id); // o
+      // console.log(selectedPost2); // o
+      selectedPost2.Comments = selectedPost2.Comments.filter(
+        (item) => item.id !== action.payload.commentId
+      );
+      // [...]
+      return newPost2;
+
     default:
-      // console.log('지정된 타입이 없습니다.');
       return state;
   }
 };

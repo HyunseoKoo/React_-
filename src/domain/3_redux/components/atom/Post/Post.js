@@ -39,7 +39,7 @@ const Post = ({ key, post }) => {
   };
 
   // Post 삭제
-  const onDeletePost = () => {
+  const onDeleteMyPost = () => {
     dispatch({
       type: 'DELETE_POST',
       payload: {
@@ -48,8 +48,7 @@ const Post = ({ key, post }) => {
     });
   };
 
-  // 코멘트 추가
-
+  // Comment 추가
   const onAddCommentForm = (e) => {
     e.preventDefault();
     dispatch({
@@ -57,8 +56,18 @@ const Post = ({ key, post }) => {
       payload: {
         name: e.target.name.value,
         content: e.target.content.value,
-        Comments: Comments,
         id: id,
+      },
+    });
+  };
+  // Comment 삭제
+  const onDeleteMyComment = (commentId) => {
+    // console.log(comment);
+    dispatch({
+      type: 'DELETE_COMMENT',
+      payload: {
+        id: id,
+        commentId: commentId,
       },
     });
   };
@@ -70,7 +79,7 @@ const Post = ({ key, post }) => {
       }}
     >
       {post.myPost && (
-        <button type="button" onClick={onDeletePost}>
+        <button type="button" onClick={onDeleteMyPost}>
           삭제
         </button>
       )}
@@ -96,7 +105,8 @@ const Post = ({ key, post }) => {
           border: '1px solid #000',
         }}
       >
-        {Comments && Comments.map((comment) => <Comment key={comment.id} comment={comment} />)}
+        {Comments &&
+          Comments.map((comment) => <Comment key={comment.id} comment={comment} post={post} />)}
       </div>
     </div>
   );

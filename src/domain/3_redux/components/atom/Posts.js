@@ -3,7 +3,6 @@ import Post from './Post/Post';
 
 const AllPosts = () => {
   const posts = useSelector((state) => state.posts);
-  // console.log('postsState', postsState);
 
   return (
     <div>

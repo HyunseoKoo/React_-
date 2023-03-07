@@ -1,5 +1,22 @@
-const Comment = ({ comment }) => {
-  // console.log(comment);
+import { useDispatch } from 'react-redux';
+
+const Comment = ({ post, key, comment }) => {
+  const dispatch = useDispatch();
+  const { id } = post;
+  // console.log(id);
+
+  // Comment 삭제
+  const onDeleteMyComment = () => {
+    // console.log(comment);
+    dispatch({
+      type: 'DELETE_COMMENT',
+      payload: {
+        id: id,
+        commentId: comment.id,
+      },
+    });
+  };
+  // ()=>onDeleteMyComment(comment.id)
   return (
     <div
       style={{
@@ -8,7 +25,11 @@ const Comment = ({ comment }) => {
     >
       <h6>{comment.User.nickName}</h6>
       <p>{comment.content}</p>
-      {comment.myComment && <button type="button">삭제</button>}
+      {comment.myComment && (
+        <button type="button" onClick={onDeleteMyComment}>
+          삭제
+        </button>
+      )}
     </div>
   );
 };

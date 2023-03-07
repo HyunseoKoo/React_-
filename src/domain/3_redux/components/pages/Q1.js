@@ -4,10 +4,6 @@ import PostForm from '../atom/Post/Form';
 import AllPosts from '../atom/Posts';
 
 const ReduxQ1Page = () => {
-  // const onSubmit = (e) => {
-  //   console.log('submit');
-  // };
-
   const dispatch = useDispatch();
   const posts = useSelector((state) => state.posts);
 
